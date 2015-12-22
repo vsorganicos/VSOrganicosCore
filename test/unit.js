@@ -2,6 +2,7 @@ const Code = require('code');   // assertion library
 const Lab = require('lab');
 const db = require('../app/database');
 const fornec = require('../app/model/fornecedor');
+const crypto = require('crypto');
 
 const lab = exports.lab = Lab.script();
 
@@ -63,6 +64,17 @@ lab.describe('Database test', () => {
 		});
 	});
 
+});
+
+lab.describe('Cypher', () => {
+	lab.it('Generate Keys', (done) => {
+		var key = new Buffer(crypto.randomBytes(32));
+		var cipher;
+
+		console.log('Ciphers ', key.toString('hex'));
+
+		done();
+	})
 });
 
 lab.describe('Test Fornecedor', () => {

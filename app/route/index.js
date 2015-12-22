@@ -2,26 +2,62 @@
 
 const Joi = require('joi');
 const fornecedor = require('../controller/fornecedor');
+const health = require('../util/system-health');
 
 var routes = [];
 
 routes.push(
 	{
 		method: 'GET',
+		path: '/health',
+		handler: health.health
+	},
+	{
+		method: 'GET',
+		path: '/vsorganicos/v1/fornecedor',
+		config: {
+			auth: 'simple',
+			handler: fornecedor.findAll
+		}
+	},
+	{
+		method: 'GET',
 		path: '/vsorganicos/v1/fornecedor/{id}',
-		handler: fornecedor.findById
+		config: {
+			auth: 'simple',
+			handler: fornecedor.findById
+		}
 
 	},
 	{
 		method: 'GET',
 		path: '/vsorganicos/v1/fornecedor/status/{status}',
-		handler: fornecedor.findByStatus
+		config: {
+			auth: 'simple',
+			handler: fornecedor.findByStatus
+		}
+	},
+	{
+		method: 'DELETE',
+		path: '/vsorganicos/v1/fornecedor',
+		config: {
+			auth: 'simple',
+			validate: {
+				payload: Joi.object().keys({
+					fornecedor: Joi.object().keys({
+						id: Joi.number().required()
+					})
+				})
+			}
+		},
+		handler: fornecedor.delete
 
 	},
 	{
 		method: 'PUT',
 		path: '/vsorganicos/v1/fornecedor',
 		config: {
+			auth: 'simple',
 			validate: {
 				payload: Joi.object().keys({
 					fornecedor: Joi.object().keys({
@@ -43,6 +79,7 @@ routes.push(
 		method: 'POST',
 		path: '/vsorganicos/v1/fornecedor',
 		config: {
+			auth: 'simple',
 			validate: {
 				payload: Joi.object().keys({
 					fornecedor: Joi.object().keys({

@@ -27,9 +27,11 @@ function openConnection() {
 
 module.exports.testConnection = function(connection, callback) {
 	connection.ping(function (err) {
-  		if (err) 
-  			throw err;
-  		
+  		if (err) {
+  			console.error(err);
+  			return callback(false);
+  		}
+ 
   		console.log('Connection ok!');
 
   		callback(true);

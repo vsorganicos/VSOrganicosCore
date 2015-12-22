@@ -7,6 +7,10 @@ var queries = {
 				" EMAIL_CONTATO, EMAIL_VENDAS, INFO_ADICIONAL, CONTATO_COMERCIAL " +
 				" FROM FORNECEDOR " +
 				" WHERE ID = ?",
+	findAll : "SELECT ID, NOME, CNPJ, FLAG_ATIVO, LAYOUT_ARQUIVO_PRODUTO, " +
+				" EMAIL_CONTATO, EMAIL_VENDAS, INFO_ADICIONAL, CONTATO_COMERCIAL " +
+				" FROM FORNECEDOR " +
+				" ORDER BY ID",			
 	findByStatus : "SELECT ID, NOME, CNPJ, FLAG_ATIVO, LAYOUT_ARQUIVO_PRODUTO, " +
 				" EMAIL_CONTATO, EMAIL_VENDAS, INFO_ADICIONAL, CONTATO_COMERCIAL " +
 				" FROM FORNECEDOR " +
@@ -18,7 +22,9 @@ var queries = {
 			 "WHERE ID = ?",
 	insert : "INSERT INTO FORNECEDOR " +
 			 "(NOME, CNPJ, FLAG_ATIVO, LAYOUT_ARQUIVO_PRODUTO, EMAIL_CONTATO, EMAIL_VENDAS, INFO_ADICIONAL, CONTATO_COMERCIAL, ID) " +
-			 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+			 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+	delete : "DELETE FROM FORNECEDOR " +
+			 "WHERE ID = ?"		 
 };
 
 var schema = function(row){
@@ -36,10 +42,41 @@ var schema = function(row){
 	return fornecedor;
 };
 
+module.exports.findAll = function(callback) {
+	var result = [];
+
+	try {
+		db.getConnection(function(error, conn) {
+			if(error)
+				return callback(error, null);
+
+			conn.query(queries.findAll, function(err, results, fields) {
+				if(err) {
+					console.error('Ocorreu um erro na consulta dos Fornecedores ', err);
+					callback(err, null);
+				}
+
+				conn.release();
+
+				results.forEach(function(row) {
+					result.push(schema(row));
+				});
+				
+				callback(null, result);
+			});
+		});
+
+	}catch(e) {
+		console.error(e);
+		callback(e, null);
+	}
+};
+
 module.exports.findById = function(id, callback) {
 	var result = null;
 
 	try {
+		console.log('######  Start findById Query #####');
 		db.getConnection(function(error, conn) {
 			if(error)
 				return callback(error, null);
@@ -172,6 +209,23 @@ module.exports.findByStatus = function(status, callback) {
 			});
 		});
 
+	}catch(e) {
+		console.error(e);
+		callback(e, null);
+	}
+};
+
+//Transaction Propagation
+module.exports.delete = function(jSon, connection, callback) {
+	try {
+		connection.query(queries.delete, [jSon.fornecedor.id], function(err, result) {
+			if(err) {
+				console.error('Erro ao excluir o fornecedor: ' + jSon.fornecedor.id, err);
+				callback(err, null);
+			}else
+				callback(null, result);
+		});
+			
 	}catch(e) {
 		console.error(e);
 		callback(e, null);
