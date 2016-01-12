@@ -3,8 +3,21 @@ const Lab = require('lab');
 const db = require('../app/database');
 const fornec = require('../app/model/fornecedor');
 const crypto = require('crypto');
+const util = require('../app/util/index');
 
 const lab = exports.lab = Lab.script();
+
+lab.describe('Loading config file', () => {
+
+	lab.it('Load archive', (done) => {
+		util.securityCredentials(function(result) {
+			//none
+			console.log(result.token);
+		});
+
+		done();
+	});
+});
 
 lab.describe('Database Pool test', () => {
 	//Force pool limit
